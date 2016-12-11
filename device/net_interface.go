@@ -79,6 +79,9 @@ func (netIF *NetInterface) SendPacket(receiveInterface *NetInterface) bool {
 	if !netIF.status {
 		return false
 	}
+	if netIF.l3Address == nil {
+		return false
+	}
 	if netIF.l3Address.IsBroadcastAddress() {
 		return false
 	}
@@ -90,6 +93,9 @@ func (netIF *NetInterface) SendPacket(receiveInterface *NetInterface) bool {
 
 func (netIF *NetInterface) ReceivePacket(ip net.IP) bool {
 	if !netIF.status {
+		return false
+	}
+	if netIF.l3Address == nil {
 		return false
 	}
 	if !netIF.l3Address.Network.Contains(ip) {

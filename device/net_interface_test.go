@@ -7,20 +7,96 @@ import (
 	"github.com/kumatch/netgame/ipnet"
 )
 
+func TestSendPacket(t *testing.T) {
+	ipAddress, _ := ipnet.NewIPAddressByCIDR("192.168.0.100/24") 
+	receiver := &NetInterface{
+		status: true,
+		l3Address: ipAddress,
+	} 
+
+	{
+		sender := &NetInterface{
+			status: false,
+		} 
+		if sender.SendPacket(receiver) { 
+			t.Errorf("send packet on down interface")
+		}
+	}
+	{
+		sender := &NetInterface{
+			status: true,
+		} 
+		if sender.SendPacket(receiver) { 
+			t.Errorf("send packet on has no ip address interface")
+		}
+	}
+	{
+		ng, _ := ipnet.NewIPAddressByCIDR("192.168.0.255/24")
+		sender := &NetInterface{
+			status: true,
+			l3Address: ng,
+		} 
+		if sender.SendPacket(receiver) { 
+			t.Errorf("send packet on broadcast address interface")
+		}
+	}
+	{
+		ng, _ := ipnet.NewIPAddressByCIDR("192.168.0.0/24")
+		sender := &NetInterface{
+			status: true,
+			l3Address: ng,
+		} 
+		if sender.SendPacket(receiver) { 
+			t.Errorf("send packet on network address interface")
+		}
+	}
+	{
+		ng, _ := ipnet.NewIPAddressByCIDR("192.168.0.1/24")
+		sender := &NetInterface{
+			status: true,
+			l3Address: ng,
+		} 
+		if !sender.SendPacket(receiver) { 
+			t.Errorf("cannot send packet")
+		}
+	}
+}
+
 func TestReceivePacket(t *testing.T) {
 	ip := net.ParseIP("192.168.0.100")
 
 	{
-		ng, _ := ipnet.NewIPAddressByCIDR("192.168.0.1/24")
 		netIF := &NetInterface{
-			status:    false,
-			l3Address: ng,
+			status: false,
 		}
-
 		if netIF.ReceivePacket(ip) {
 			t.Errorf("Receive packet on down interface.")
 		}
-
+	}
+	{
+		netIF := &NetInterface{
+			status: true,
+		}
+		if netIF.ReceivePacket(ip) {
+			t.Errorf("Receive packet on has no IP address interface.")
+		}
+	}
+	{
+		ng, _ := ipnet.NewIPAddressByCIDR("192.168.0.100/24")
+		netIF := &NetInterface{
+			status:    true,
+			l3Address: ng,
+		}
+		if netIF.ReceivePacket(ip) {
+			t.Errorf("Receive packet on same IP address.")
+		}
+	}	
+	{
+		ng, _ := ipnet.NewIPAddressByCIDR("192.168.0.1/24")
+		netIF := &NetInterface{
+			status:    true,
+			l3Address: ng,
+		}
 		netIF.status = true
 		if !netIF.ReceivePacket(ip) {
 			t.Errorf("Cannot receive packet")
