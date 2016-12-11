@@ -12,7 +12,7 @@ type ifStatus bool
 
 type MacAddress [6]uint8
 
-func (m MacAddress) String() (mac string) {	
+func (m MacAddress) String() (mac string) {
 	for i, v := range m {
 		s := strconv.FormatUint(uint64(v), 16)
 		if len(s) > 1 {
@@ -20,11 +20,11 @@ func (m MacAddress) String() (mac string) {
 		} else {
 			mac += "0" + s
 		}
-		if (i % 2) > 0 && i < 5 {
+		if (i%2) > 0 && i < 5 {
 			mac += "."
 		}
 	}
-	return 
+	return
 }
 
 func (m MacAddress) Increase(num int) MacAddress {
@@ -34,10 +34,8 @@ func (m MacAddress) Increase(num int) MacAddress {
 	}
 	mac[5] += uint8(num)
 
-	return mac 
+	return mac
 }
-
-
 
 func (i ifStatus) String() string {
 	if i {
@@ -57,7 +55,7 @@ type NetInterface struct {
 	status    ifStatus
 	ifType    *InterfaceType
 	l2Address MacAddress
-	l3Address *ipnet.IPAddresss 
+	l3Address *ipnet.IPAddresss
 }
 
 func (netIF *NetInterface) GetName() string {
@@ -85,7 +83,7 @@ func (netIF *NetInterface) Ping(ipAddress *ipnet.IPAddresss) bool {
 		return false
 	}
 
-	if !netIF.l3Address.IsSameNetwork(ipAddress) { 
+	if !netIF.l3Address.IsSameNetwork(ipAddress) {
 		return false
 	}
 
@@ -101,11 +99,10 @@ func (netIF *NetInterface) Ping(ipAddress *ipnet.IPAddresss) bool {
 		return false
 	}
 
-
 	return true
 }
 
-func (i *NetInterface) Show() (string, error) {
+func (i *NetInterface) Show() string {
 	text := `{{.name}} is {{.isUp}}
 Hardware is {{.ifTypeName}} Port, address is {{.mac}}
 Internet address is {{.ip}}
@@ -133,23 +130,23 @@ Auto-duplex, Auto Speed`
 
 	t, err := template.New("show_interfaces").Parse(text)
 	if err != nil {
-		return "", err
+		panic(err)
 	}
 
 	buff := bytes.NewBufferString("")
 	err = t.Execute(buff, values)
 	if err != nil {
-		return "", err
+		panic(err)
 	}
 
-	return buff.String(), nil
+	return buff.String()
 }
 
 func NewNetInterface(name string, ifType *InterfaceType, l2Address MacAddress) *NetInterface {
 	return &NetInterface{
-		name:   name,
-		status: false,
-		ifType: ifType,
+		name:      name,
+		status:    false,
+		ifType:    ifType,
 		l2Address: l2Address,
 	}
 }

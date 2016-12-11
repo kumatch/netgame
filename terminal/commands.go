@@ -14,6 +14,7 @@ func newGlobalCommands() *terminalCommands {
 	acts := []*action{
 		setConfigureModeAction(), // configure terminal
 		showInterfacesAction(),   // show interfaces
+		showIPRouteAction(),      // show ip route
 		showClockAction(),        // show clock
 		exitAction(),             // exit
 	}
@@ -43,7 +44,7 @@ func newConfigureInterfaceCommands() *terminalCommands {
 	acts := []*action{
 		setConfigureTerminalModeAction(), // interface eth1
 		interfaceShutdownAction(),        // shutdown
-		interfaceNoShutdownAction(),	  // no shutdown 
+		interfaceNoShutdownAction(),      // no shutdown
 		interfaceSetAddressAction(),      // ip address ...
 		endAction(),                      // end
 	}

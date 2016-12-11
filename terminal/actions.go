@@ -76,16 +76,25 @@ func showInterfacesAction() *action {
 		commands: []string{"show", "interfaces"},
 		config: &actionConfig{
 			method: func(args []string, s *state, out io.Writer) {
-				for _, netIF := range s.device.GetInterfaces() {
-					showInt, err := netIF.Show()
-					if err != nil {
-						panic(err)
-					}
-					out.Write([]byte(showInt))
+				for _, showedInterface := range s.device.GetInterfaces() {
+					out.Write([]byte(showedInterface))
 					out.Write([]byte(""))
 				}
 			},
 			//maxArgNumber: 1
+		},
+	}
+}
+
+func showIPRouteAction() *action {
+	return &action{
+		commands: []string{"show", "ip", "route"},
+		config: &actionConfig{
+			method: func(args []string, s *state, out io.Writer) {
+				for _, route := range s.device.GetRouteTable() {
+					out.Write([]byte(route))
+				}
+			},
 		},
 	}
 }
@@ -128,7 +137,7 @@ func interfaceShutdownAction() *action {
 		commands: []string{"shutdown"},
 		config: &actionConfig{
 			method: func(args []string, s *state, out io.Writer) {
-				s.device.GetInterface(s.configIFName).Down()  
+				s.device.SetInterfaceStatus(s.configIFName, false)
 			},
 		},
 	}
@@ -139,7 +148,7 @@ func interfaceNoShutdownAction() *action {
 		commands: []string{"no", "shutdown"},
 		config: &actionConfig{
 			method: func(args []string, s *state, out io.Writer) {
-				s.device.GetInterface(s.configIFName).Up()  
+				s.device.SetInterfaceStatus(s.configIFName, true)
 			},
 		},
 	}
@@ -166,7 +175,7 @@ func interfaceSetAddressAction() *action {
 					outInvalidArgs(out, args)
 				}
 
-				s.device.GetInterface(s.configIFName).SetIPAddress(ipAddress) 
+				s.device.SetIPAddress(s.configIFName, ipAddress)
 			},
 			minArgNumebr: 2,
 			maxArgNumber: 2,
