@@ -71,24 +71,8 @@ func (d *Device) SetInterfaceStatus(name string, up bool) {
 	}
 }
 
-func (d *Device) GetRouteTable() []string {
+func (d *Device) GetRoutes() []string {
 	return d.routeTable.show()
-}
-
-func (d *Device) Ping(destIF *NetInterface) bool {
-	network := destIF.l3Address.Network
-	route := d.routeTable.matchesRoute(network)
-	if route == nil {
-		return false
-	}
-
-	switch r := route.(type) {
-	case *connectedRoute:
-		senderIP := r.netIF.l3Address.IP
-		return destIF.ReceivePacket(senderIP)
-	}
-
-	return false
 }
 
 func createNetInterface(ifType *InterfaceType, macAddress MacAddress, num int) *NetInterface {

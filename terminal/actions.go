@@ -91,7 +91,7 @@ func showIPRouteAction() *action {
 		commands: []string{"show", "ip", "route"},
 		config: &actionConfig{
 			method: func(args []string, s *state, out io.Writer) {
-				for _, route := range s.device.GetRouteTable() {
+				for _, route := range s.device.GetRoutes() {
 					out.Write([]byte(route))
 				}
 			},
