@@ -46,7 +46,7 @@ func createRandomIPAddress(ipn *net.IPNet) *ipnet.IPAddresss {
 		ip = incrementAddress(ip)
 	}
 
-	return ipnet.NewIPAddress(ip, ipn)  
+	return ipnet.NewIPAddress(ip, ipn)
 }
 
 func createRandomInterfaceType() *device.InterfaceType {

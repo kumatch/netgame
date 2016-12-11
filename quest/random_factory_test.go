@@ -49,7 +49,7 @@ func TestCreateRandomIPHost(t *testing.T) {
 				t.Errorf("expect: %v, got: %s", a, ip)
 			}
 			if ipAddress.Network.IP.String() != ipn.IP.String() {
-				t.Errorf("expect: %s, got: %s", ipn.IP, ipAddress.Network.IP)				
+				t.Errorf("expect: %s, got: %s", ipn.IP, ipAddress.Network.IP)
 			}
 			if ipn.IP.String() != "192.168.250.0" {
 				t.Errorf("broken original IP address.")
@@ -76,11 +76,11 @@ func TestCreateRandomIPHost(t *testing.T) {
 				t.Errorf("expect = %v, got = %s", b, ip)
 			}
 			if ipAddress.Network.IP.String() != ipn.IP.String() {
-				t.Errorf("expect: %s, got: %s", ipn.IP, ipAddress.Network.IP)				
+				t.Errorf("expect: %s, got: %s", ipn.IP, ipAddress.Network.IP)
 			}
 			if ipn.IP.String() != "192.168.250.248" {
 				t.Errorf("broken original IP address.")
-			}			
+			}
 		}
 	}
 }

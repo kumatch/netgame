@@ -46,47 +46,47 @@ func TestNewIPAddressByCIDR(t *testing.T) {
 }
 
 func TestSameAddress(t *testing.T) {
-	a, _ := NewIPAddressByCIDR("192.168.0.100/24") 
+	a, _ := NewIPAddressByCIDR("192.168.0.100/24")
 	b, _ := NewIPAddressByCIDR("192.168.0.100/24")
 	c, _ := NewIPAddressByCIDR("192.168.0.101/24")
 
 	if !a.IsSame(b) {
 		t.Errorf("same ip address IsSame() is false: %s, %s", a, b)
-	} 
+	}
 	if a.IsSame(c) {
 		t.Errorf("not same ip address IsSame() is true: %s, %s", a, c)
-	} 
+	}
 }
 
 func TestSameNetworkAddress(t *testing.T) {
 	{
-		a, _ := NewIPAddressByCIDR("192.168.0.0/24") 
+		a, _ := NewIPAddressByCIDR("192.168.0.0/24")
 		b, _ := NewIPAddressByCIDR("192.168.0.0/24")
 		c, _ := NewIPAddressByCIDR("192.168.1.0/24")
 
 		if !a.IsSameNetwork(b) {
 			t.Errorf("same network address IsSameNetwork() is false: %s, %s", a, b)
-		} 
+		}
 		if a.IsSameNetwork(c) {
 			t.Errorf("not same network address IsSameNetwork() is true: %s, %s", a, c)
 		}
 	}
 
 	{
-		a, _ := NewIPAddressByCIDR("192.168.0.100/24") 
+		a, _ := NewIPAddressByCIDR("192.168.0.100/24")
 		b, _ := NewIPAddressByCIDR("192.168.0.101/24")
 		c, _ := NewIPAddressByCIDR("192.168.0.100/25")
 
 		if !a.IsSameNetwork(b) {
 			t.Errorf("same network address IsSameNetwork() is false: %s, %s", a, b)
-		} 
+		}
 		if a.IsSameNetwork(c) {
 			t.Errorf("not same network address IsSameNetwork() is true: %s, %s", a, c)
 		}
 		if b.IsSameNetwork(c) {
 			t.Errorf("not same network address IsSameNetwork() is true: %s, %s", b, c)
 		}
-	} 
+	}
 }
 
 func TestBroadcastAddress(t *testing.T) {

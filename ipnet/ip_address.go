@@ -31,7 +31,7 @@ func NewIPAddressByCIDR(cidr string) (*IPAddresss, error) {
 
 func (a *IPAddresss) String() string {
 	mask, _ := a.Network.Mask.Size()
-	return a.IP.String() + "/" + strconv.Itoa(mask) 
+	return a.IP.String() + "/" + strconv.Itoa(mask)
 }
 
 func (a *IPAddresss) getBroadcastAddress() *IPAddresss {
@@ -42,15 +42,15 @@ func (a *IPAddresss) getBroadcastAddress() *IPAddresss {
 		ip[i] |= 255 ^ v
 	}
 
-	return NewIPAddress(ip, a.Network) 
+	return NewIPAddress(ip, a.Network)
 }
- 
+
 func (a *IPAddresss) IsSame(b *IPAddresss) bool {
 	if a == nil || b == nil {
 		return false
 	}
 
-	return a.String() == b.String() 
+	return a.String() == b.String()
 }
 
 func (a *IPAddresss) IsSameNetwork(b *IPAddresss) bool {
@@ -58,14 +58,13 @@ func (a *IPAddresss) IsSameNetwork(b *IPAddresss) bool {
 		return false
 	}
 
-	return a.Network.String() == b.Network.String()	 
+	return a.Network.String() == b.Network.String()
 }
 
-
 func (a *IPAddresss) IsBroadcastAddress() bool {
-	return a.String() == a.getBroadcastAddress().String() 
+	return a.String() == a.getBroadcastAddress().String()
 }
 
 func (a *IPAddresss) IsNetworkAddress() bool {
-	return a.String() == a.Network.String() 
+	return a.String() == a.Network.String()
 }
