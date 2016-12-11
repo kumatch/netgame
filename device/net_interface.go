@@ -98,34 +98,6 @@ func (netIF *NetInterface) ReceivePacket(ip net.IP) bool {
 	return netIF.l3Address.IP.String() != ip.String()
 }
 
-func (netIF *NetInterface) Ping(ipAddress *ipnet.IPAddresss) bool {
-	if !netIF.status {
-		return false
-	}
-
-	if netIF.l3Address == nil {
-		return false
-	}
-
-	if !netIF.l3Address.IsSameNetwork(ipAddress) {
-		return false
-	}
-
-	if netIF.l3Address.IsSame(ipAddress) {
-		return false
-	}
-
-	if netIF.l3Address.IsNetworkAddress() {
-		return false
-	}
-
-	if netIF.l3Address.IsBroadcastAddress() {
-		return false
-	}
-
-	return true
-}
-
 func (i *NetInterface) Show() string {
 	text := `{{.name}} is {{.isUp}}
 Hardware is {{.ifTypeName}} Port, address is {{.mac}}
