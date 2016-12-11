@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Netgame</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<style>
+<!--
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+.header,
+.footer {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+.header {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5e5e5;
+}
+.header h3 {
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 40px;
+}
+.footer {
+  padding-top: 19px;
+  color: #777;
+  border-top: 1px solid #e5e5e5;
+}
+@media (min-width: 768px) {
+  .container {
+    max-width: 730px;
+  }
+}
+@media screen and (min-width: 768px) {
+  .header,
+  .footer {
+    padding-right: 0;
+    padding-left: 0;
+  }
+  .header {
+    margin-bottom: 30px;
+  }
+}
+.template {
+  display: none
+}
+-->
+</style>
+
+<script>  
+$(function() {
+    var ws;
+
+    var resetSheet = function () {
+        $('#segments').text("")
+        $('.verifier-succeed').hide();
+        $('.verifier-failed').hide();
+        $('#verify').css("visibility", "visible");
+    };
+
+    var templateSegment = function (num, segment) {
+        var $seg = $('#segment-template .segment').clone();
+        $('.segment-number', $seg).text(num);
+        $('.interface', $seg).text(segment.device_interface);
+        $('.destination-host', $seg).text(segment.destination_host);
+        return $seg
+    };
+
+    var setSpecNo = function (specNo) {
+        $('#spec-no').text(specNo);
+    };
+
+    var receiveOrder = function (ordered) {
+        if (ordered) {
+             $('.container').show();
+        } else {
+             $('.container').hide();
+        }
+    };
+
+    var connect = function () {
+        return new WebSocket("ws://{{.Host}}/ws");
+    };
+
+    ws = connect();
+    ws.onopen = function(e) {
+        console.log("connected.");
+        var ticker;
+        timer = setInterval(function () {
+            if (ws) {
+                var message = { "type": "keep", "payload": true };
+                ws.send(JSON.stringify(message));
+            } else {
+                ws = connect();
+            }
+        }, 15 * 1000);
+
+    }
+    ws.onclose = function(e) {
+        console.log("close.");
+        ws = null
+    }
+
+    ws.onmessage = function(e) {
+        var data = JSON.parse(e.data)
+
+        switch (data.type) {
+        case "spec":
+            if (!data.payload || !data.payload.segments) {
+                return;
+            }
+
+            resetSheet();
+            data.payload.segments.forEach(function (seg, i) {
+                var $seg = templateSegment((i+1), seg)
+                $('#segments').append($seg)
+            });
+            setSpecNo(data.payload.spec_no)
+            receiveOrder(data.payload.segments.length > 0)
+
+            break;
+        case "verify":
+            if (data.payload) {
+                $('.verifier-failed').hide();
+                $('.verifier-succeed').show();
+                $('#verify').css("visibility", "hidden");
+            } else {
+                $('.verifier-succeed').hide();
+                $('.verifier-failed').show();
+            }
+            break;
+        }
+    }
+
+    ws.onerror = function(e) {
+        console.error(e.data);
+    }
+
+    $("#verify").on("click", function(e) {
+        var message = { "type": "verify" };
+        ws.send(JSON.stringify(message));
+        return false;
+    });
+});
+</script>
+
+<style type="text/css">
+html {
+    overflow: hidden;
+}
+body {
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+#log {
+    background: white;
+    margin: 0;
+    padding: 0.5em 0.5em 0.5em 0.5em;
+    position: absolute;
+    top: 0.5em;
+    left: 0.5em;
+    right: 0.5em;
+    bottom: 3em;
+    overflow: auto;
+}
+#log pre {
+  margin: 0;
+}
+#form {
+    padding: 0 0.5em 0 0.5em;
+    margin: 0;
+    position: absolute;
+    bottom: 1em;
+    left: 0px;
+    width: 100%;
+    overflow: hidden;
+}
+.verifier-message {
+    margin: 20px 0;
+}
+.verifier-failed, .verifier-succeed {
+    display:none;
+}
+</style>
+</head>
+
+<body>
+
+  <div class="container" style="display:none;">
+    <div class="header clearfix">
+      <h3 class="text-muted">Network spec sheet - No. <span id="spec-no"></span></h3>
+    </div>
+
+    <div id="segments"></div>
+
+    <div class="row">
+      <div class="col-md-4 col-md-offset-4">
+        <button id="verify" type="button" class="btn btn-warning btn-lg btn-block">Verify network</button>
+      </div>
+    </div>
+
+    <div class="row verifier-message">
+      <div class="col-md-12">
+        <div class="alert alert-danger verifier-failed" role="alert">
+          Cannot connect. Check spec and device configuration.
+        </div>
+        <div class="alert alert-success verifier-succeed" role="alert">
+          Done! You successfully configure device. Will deliver next spec sheet soon....
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="segment-template" class="template">
+    <div class="segment">
+      <h4>Segment <span class="segment-number"></span></h4>
+      <table class="table table-bordered">
+        <tr>
+          <th class="col-md-3">Interface</th>
+          <td class="col-md-9 interface"></td>
+        </tr>
+        <tr>
+          <th class="col-md-3">Destination Host</th>
+          <td class="col-md-9 destination-host"></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

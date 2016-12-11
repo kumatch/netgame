@@ -1,0 +1,6 @@
+package: github.com/kumatch/netgame
+import:
+- package: github.com/chzyer/readline
+  version: c914be64f07d9998f52bf0d598ec26d457168c0f
+- package: github.com/gorilla/websocket
+  version: ^1.0.0

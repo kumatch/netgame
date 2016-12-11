@@ -1,0 +1,8 @@
+hash: 8f009cb482c642e81c2b5df0cca66a57af403fc23495f343304fc92d390bf4f4
+updated: 2016-12-03T15:35:16.909706638Z
+imports:
+- name: github.com/chzyer/readline
+  version: c914be64f07d9998f52bf0d598ec26d457168c0f
+- name: github.com/gorilla/websocket
+  version: 1f512fc3f05332ba7117626cdfb4e07474e58e60
+testImports: []
