@@ -6,7 +6,6 @@ import (
 )
 
 type route interface {
-	Enabled() bool
 	String() string
 }
 
@@ -22,6 +21,14 @@ func newConnectedRoute(netIF *NetInterface) *connectedRoute {
 
 func (r *connectedRoute) Enabled() bool {
 	return r.netIF.status == true
+}
+
+func (r *connectedRoute) SameNetwork(network *net.IPNet) bool {
+	return r.netIF.l3Address.Network.String() == network.String()
+}
+
+func (r *connectedRoute) ContainIP(ip net.IP) bool {
+	return r.netIF.l3Address.Network.Contains(ip)
 }
 
 func (r *connectedRoute) String() string {
@@ -51,17 +58,38 @@ func (r *staticRoute) String() string {
 	return fmt.Sprintf("%s via %s, %s", r.network.String(), r.nextIP, r.netIF.GetName())
 }
 
-type routeTable struct {
-	routes []route
+func (r *staticRoute) SameNetwork(network *net.IPNet) bool {
+	return r.netIF.l3Address.Network.String() == network.String()
 }
 
-func (table *routeTable) addRoute(r route) {
-	table.routes = append(table.routes, r)
+type routeTable struct {
+	connections map[string]*connectedRoute
+	statics     map[string]*staticRoute
+}
+
+func newRouteTable() *routeTable {
+	return &routeTable{
+		connections: map[string]*connectedRoute{},
+	}
+}
+
+func (table *routeTable) addConnectedRoute(r *connectedRoute) {
+	name := r.netIF.GetName()
+	table.connections[name] = r
+}
+
+func (table *routeTable) matchesRoute(network *net.IPNet) route {
+	for _, r := range table.connections {
+		if r.SameNetwork(network) {
+			return r
+		}
+	}
+	return nil
 }
 
 func (table *routeTable) show() []string {
 	routes := []string{}
-	for _, r := range table.routes {
+	for _, r := range table.connections {
 		if r.Enabled() {
 			routes = append(routes, r.String())
 		}

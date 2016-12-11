@@ -2,6 +2,7 @@ package device
 
 import (
 	"bytes"
+	"net"
 	"strconv"
 	"text/template"
 
@@ -72,6 +73,29 @@ func (netIF *NetInterface) Down() {
 
 func (netIF *NetInterface) SetIPAddress(ipAddress *ipnet.IPAddresss) {
 	netIF.l3Address = ipAddress
+}
+
+func (netIF *NetInterface) SendPacket(receiveInterface *NetInterface) bool {
+	if !netIF.status {
+		return false
+	}
+	if netIF.l3Address.IsBroadcastAddress() {
+		return false
+	}
+	if netIF.l3Address.IsNetworkAddress() {
+		return false
+	}
+	return receiveInterface.ReceivePacket(netIF.l3Address.IP)
+}
+
+func (netIF *NetInterface) ReceivePacket(ip net.IP) bool {
+	if !netIF.status {
+		return false
+	}
+	if !netIF.l3Address.Network.Contains(ip) {
+		return false
+	}
+	return netIF.l3Address.IP.String() != ip.String()
 }
 
 func (netIF *NetInterface) Ping(ipAddress *ipnet.IPAddresss) bool {

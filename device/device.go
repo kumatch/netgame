@@ -11,6 +11,20 @@ type Device struct {
 	routeTable *routeTable
 }
 
+func NewDevice(ifType *InterfaceType, macAddress MacAddress, ifNum int) *Device {
+	d := &Device{
+		interfaces: make([]*NetInterface, ifNum),
+		routeTable: newRouteTable(),
+	}
+	for i := 0; i < ifNum; i++ {
+		n := i + 1
+		mac := macAddress.Increase(n)
+		d.interfaces[i] = createNetInterface(ifType, mac, n)
+	}
+
+	return d
+}
+
 func (d *Device) getInterface(name string) *NetInterface {
 	for _, netIF := range d.interfaces {
 		if netIF.name == name {
@@ -45,7 +59,7 @@ func (d *Device) SetIPAddress(name string, ipAddress *ipnet.IPAddresss) {
 	netIF.SetIPAddress(ipAddress)
 
 	route := newConnectedRoute(netIF)
-	d.routeTable.addRoute(route)
+	d.routeTable.addConnectedRoute(route)
 }
 
 func (d *Device) SetInterfaceStatus(name string, up bool) {
@@ -61,18 +75,20 @@ func (d *Device) GetRouteTable() []string {
 	return d.routeTable.show()
 }
 
-func NewDevice(ifType *InterfaceType, macAddress MacAddress, ifNum int) *Device {
-	d := &Device{
-		interfaces: make([]*NetInterface, ifNum),
-		routeTable: &routeTable{},
-	}
-	for i := 0; i < ifNum; i++ {
-		n := i + 1
-		mac := macAddress.Increase(n)
-		d.interfaces[i] = createNetInterface(ifType, mac, n)
+func (d *Device) Ping(destIF *NetInterface) bool {
+	network := destIF.l3Address.Network
+	route := d.routeTable.matchesRoute(network)
+	if route == nil {
+		return false
 	}
 
-	return d
+	switch r := route.(type) {
+	case *connectedRoute:
+		senderIP := r.netIF.l3Address.IP
+		return destIF.ReceivePacket(senderIP)
+	}
+
+	return false
 }
 
 func createNetInterface(ifType *InterfaceType, macAddress MacAddress, num int) *NetInterface {

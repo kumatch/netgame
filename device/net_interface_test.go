@@ -1,10 +1,52 @@
 package device
 
 import (
+	"net"
 	"testing"
 
 	"github.com/kumatch/netgame/ipnet"
 )
+
+func TestReceivePacket(t *testing.T) {
+	ip := net.ParseIP("192.168.0.100")
+
+	{
+		ng, _ := ipnet.NewIPAddressByCIDR("192.168.0.1/24")
+		netIF := &NetInterface{
+			status:    false,
+			l3Address: ng,
+		}
+
+		if netIF.ReceivePacket(ip) {
+			t.Errorf("Receive packet on down interface.")
+		}
+
+		netIF.status = true
+		if !netIF.ReceivePacket(ip) {
+			t.Errorf("Cannot receive packet")
+		}
+	}
+	{
+		ng, _ := ipnet.NewIPAddressByCIDR("192.168.1.1/24")
+		netIF := &NetInterface{
+			status:    true,
+			l3Address: ng,
+		}
+		if netIF.ReceivePacket(ip) {
+			t.Errorf("Receive packet on different IP network.")
+		}
+	}
+	{
+		ng, _ := ipnet.NewIPAddressByCIDR("192.168.0.1/16")
+		netIF := &NetInterface{
+			status:    true,
+			l3Address: ng,
+		}
+		if !netIF.ReceivePacket(ip) {
+			t.Errorf("Cannot receive packet, different IP network but can take.")
+		}
+	}
+}
 
 func TestPing(t *testing.T) {
 	ip, _ := ipnet.NewIPAddressByCIDR("192.168.0.101/24")
@@ -27,7 +69,7 @@ func TestPing(t *testing.T) {
 
 	{
 		netIF := &NetInterface{}
-        netIF.Up()
+		netIF.Up()
 		if netIF.Ping(ip) {
 			t.Errorf("ping OK, but its invalid: ip=%s", ip)
 		}
@@ -36,14 +78,14 @@ func TestPing(t *testing.T) {
 				t.Errorf("ping OK, but its invalid: ip=%s", ng)
 			}
 		}
-	}    
+	}
 
 	{
-    	setIP, _ := ipnet.NewIPAddressByCIDR("192.168.0.1/24")
-        
+		setIP, _ := ipnet.NewIPAddressByCIDR("192.168.0.1/24")
+
 		netIF := &NetInterface{}
-        netIF.Up()
-        netIF.SetIPAddress(setIP) 
+		netIF.Up()
+		netIF.SetIPAddress(setIP)
 		if !netIF.Ping(ip) {
 			t.Errorf("ping NG, its invalid: ip=%s", ip)
 		}
@@ -55,26 +97,26 @@ func TestPing(t *testing.T) {
 	}
 
 	{
-    	setIP, _ := ipnet.NewIPAddressByCIDR("192.168.0.0/24")
-        
+		setIP, _ := ipnet.NewIPAddressByCIDR("192.168.0.0/24")
+
 		netIF := &NetInterface{}
-        netIF.Up()
-        netIF.SetIPAddress(setIP) 
+		netIF.Up()
+		netIF.SetIPAddress(setIP)
 		if netIF.Ping(ip) {
 			t.Errorf("ping OK, but its invalid: ip=%s", ip)
 		}
-	}            
+	}
 
 	{
-    	setIP, _ := ipnet.NewIPAddressByCIDR("192.168.0.255/24")
-        
+		setIP, _ := ipnet.NewIPAddressByCIDR("192.168.0.255/24")
+
 		netIF := &NetInterface{}
-        netIF.Up()
-        netIF.SetIPAddress(setIP) 
+		netIF.Up()
+		netIF.SetIPAddress(setIP)
 		if netIF.Ping(ip) {
 			t.Errorf("ping OK, but its invalid: ip=%s", ip)
 		}
-	}                
+	}
 }
 
 func TestIfShow(t *testing.T) {
@@ -91,6 +133,6 @@ func TestIfShow(t *testing.T) {
 	}
 
 	i.SetIPAddress(ipAdddress)
-	v, _ := i.Show()
+	v := i.Show()
 	t.Log(v)
 }

@@ -7,11 +7,28 @@ type questWorld struct {
 }
 
 func (w *questWorld) verify() bool {
-	if !w.device.getSourceNetworkInterface().Ping(w.srcCompanion.ipAddress) {
+	srcCompanionInterface := w.srcCompanion.NetIF
+	destCompanionInterface := w.destCompanion.NetIF
+	deviceSourceNetworkInterface := w.device.getSourceNetworkInterface()
+	deviceDestinationNetworkInterface := w.device.getDestinationNetworkInterface()
+
+	// source companion -> device
+	if !srcCompanionInterface.SendPacket(deviceSourceNetworkInterface) {
 		return false
 	}
 
-	if !w.device.getDestinationNetworkInterface().Ping(w.destCompanion.ipAddress) {
+	// device -> destination companion
+	if !deviceDestinationNetworkInterface.SendPacket(destCompanionInterface) {
+		return false
+	}
+
+	// destination companion -> device
+	if !destCompanionInterface.SendPacket(deviceDestinationNetworkInterface) {
+		return false
+	}
+
+	// device -> source companion
+	if !deviceSourceNetworkInterface.SendPacket(srcCompanionInterface) {
 		return false
 	}
 
@@ -20,7 +37,7 @@ func (w *questWorld) verify() bool {
 
 func newQuestWorld(f *questFixture) *questWorld {
 	return &questWorld{
-		srcCompanion: newCompanion(f.srcIPAddress), 			
+		srcCompanion:  newCompanion(f.srcIPAddress),
 		destCompanion: newCompanion(f.destIPAddress),
 		device:        newQuestDevice(),
 	}
