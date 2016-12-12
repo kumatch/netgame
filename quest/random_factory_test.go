@@ -18,7 +18,7 @@ func TestCreateRandomCIDRMask(t *testing.T) {
 
 func TestCreateRandom8BitIPAddress(t *testing.T) {
 	var i int
-	for i = 0; i < 10000; i++ {
+	for i = 0; i < 100000; i++ {
 		r := createRandom8BitIPAddress()
 		if r < 0 || r > 255 {
 			t.Errorf("expect = 0 to 255, got = %d", r)
@@ -29,10 +29,16 @@ func TestCreateRandom8BitIPAddress(t *testing.T) {
 func TestCreateRandomIPNetwork(t *testing.T) {
 	reg := regexp.MustCompile(`^[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}/\d\d$`)
 	var i int
-	for i = 0; i < 10000; i++ {
+	for i = 0; i < 100000; i++ {
 		ipNet := createRandomIPNetwork()
 		if !reg.Match([]byte(ipNet.String())) {
 			t.Errorf("got: %v", ipNet.String())
+		}
+		if ipNet.IP[0] >= 224 {
+			t.Errorf("got: %v, its class D or higher.", ipNet.String())
+		}
+		if ipNet.IP[0] == 169 && ipNet.IP[1] == 254 {
+			t.Errorf("got: %v, its Link local.", ipNet.String())
 		}
 	}
 }

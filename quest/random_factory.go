@@ -19,12 +19,19 @@ func createRandomCIDRMask() int {
 	return 20 + rand.Intn(11)
 }
 
-// createRandomIPNetwork TODO exclude multicast, unitcast...
+// createRandomIPNetwork return a random IPv4 Address, class A to C and excludes link local.
 func createRandomIPNetwork() *net.IPNet {
 	a := make([]int, 4)
-	for i := 0; i < 4; i++ {
-		a[i] = createRandom8BitIPAddress()
+	for {
+		a[0] = 1 + rand.Intn(223)
+		for i := 1; i < 4; i++ {
+			a[i] = createRandom8BitIPAddress()
+		}
+		if a[0] != 169 || a[1] != 254 {
+			break
+		}
 	}
+
 	cidr := fmt.Sprintf("%d.%d.%d.%d/%d", a[0], a[1], a[2], a[3], createRandomCIDRMask())
 	_, ipn, err := net.ParseCIDR(cidr)
 	if err != nil {
