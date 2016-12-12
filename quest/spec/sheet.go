@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math/rand"
 	"net"
+	"strings"
+	"unicode"
 
 	"github.com/kumatch/netgame/ipnet"
 )
@@ -17,7 +19,7 @@ type Segment struct {
 func NewSegment(ipn *net.IPNet, dest *ipnet.IPAddresss, name string) *Segment {
 	return &Segment{
 		//IPNetwork:       ipn.String(),
-		DestinationHost: dest.String(),
+		DestinationHost: destinationHost(dest),
 		InterfaceName:   name,
 	}
 }
@@ -37,4 +39,45 @@ func NewSpecSheet() *Sheet {
 
 func (s *Sheet) AddSegument(seg *Segment) {
 	s.Segments = append(s.Segments, seg)
+}
+
+func destinationHost(ipAddress *ipnet.IPAddresss) string {
+	var host string
+	n := rand.Intn(30)
+	if n > 1 {
+		host = ipAddress.String()
+	} else if n == 1 {
+		host = up(ipAddress.String())
+	} else {
+		host = up1(ipAddress.String())
+	}	
+	return host
+}
+
+func up(str string) string {
+	c := unicode.SpecialCase{
+		unicode.CaseRange{
+			Lo: 0x0030, // 0
+			Hi: 0x0039, // 9
+			Delta: [unicode.MaxCase]rune{
+				0xff10 - 0x0030, // UpperCase
+				0,               // LowerCase
+				0,               // TitleCase
+			},
+		},
+	}
+	return strings.ToUpperSpecial(c, str)
+}
+
+func up1(str string) string {
+	index := rand.Intn(len(str))
+	res := ""
+	for i := 0; i < index; i++ {
+		res += string(str[i])
+	}
+	res += up(string(str[index]))
+	for j := index + 1; j < len(str); j++ {
+		res += string(str[j])
+	}
+	return res
 }
