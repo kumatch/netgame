@@ -41,10 +41,10 @@ func (h *handler) invoke(commands []string, s *state, out io.Writer) {
 			panic("Fatal: action config is not defined.")
 		}
 		args = commands[(index + 1):]
-		if node.actionConfig.IsLesserArguments(args) ||  node.actionConfig.IsGreaterArguments(args) {
+		if node.actionConfig.IsLesserArguments(args) || node.actionConfig.IsGreaterArguments(args) {
 			outInvalidArgs(out, args)
-			return 			
-		} 
+			return
+		}
 
 		method = node.actionConfig.method
 		break

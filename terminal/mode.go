@@ -7,17 +7,17 @@ type mode interface {
 type globalMode struct{}
 
 func (m *globalMode) prompt(hostname string) string {
-    return hostname + "# "
+	return hostname + "# "
 }
 
 type configureMode struct{}
 
 func (m *configureMode) prompt(hostname string) string {
-    return hostname + "(config)# "
+	return hostname + "(config)# "
 }
 
 type configureInterfaceMode struct{}
 
 func (m *configureInterfaceMode) prompt(hostname string) string {
-    return hostname + "(config-if)# "
+	return hostname + "(config-if)# "
 }

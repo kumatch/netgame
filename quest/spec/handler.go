@@ -124,7 +124,7 @@ func (h *serverHandler) serveMain(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	homeTemplate, err := template.New("index").Parse(string(homeHTML)) 
+	homeTemplate, err := template.New("index").Parse(string(homeHTML))
 	if err != nil {
 		panic(err)
 	}

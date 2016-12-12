@@ -34,8 +34,8 @@ func (a *action) splitAction() (cmd string, childAction *action) {
 	cmd = a.commands[0]
 	if len(a.commands) > 1 {
 		childAction = &action{
-			commands:     a.commands[1:],
-			config: a.config,
+			commands: a.commands[1:],
+			config:   a.config,
 		}
 	}
 	return
@@ -46,7 +46,7 @@ type actionMethod func(args []string, s *state, out io.Writer)
 type actionNode struct {
 	command      string
 	children     *actionNodes
-	actionConfig *actionConfig 
+	actionConfig *actionConfig
 }
 
 func (n *actionNode) IsSameCommand(cmd string) bool {
@@ -99,7 +99,7 @@ func (nodes *actionNodes) add(a *action) {
 		if isExistsNode && !node.IsEnd() {
 			panic(fmt.Sprintf("Fatal: adding action [%s] to not end node.", strings.Join(a.commands, " ")))
 		}
-		node.setActionConfig(a.config) 
+		node.setActionConfig(a.config)
 	}
 }
 

@@ -5,12 +5,12 @@ import (
 )
 
 func createPrefixCompleter(nodes *actionNodes) *readline.PrefixCompleter {
-	completers := []readline.PrefixCompleterInterface{} 
+	completers := []readline.PrefixCompleterInterface{}
 	for _, n := range *nodes {
 		completers = append(completers, actionNodeToPrefixCompleter(n))
 	}
 
-	return readline.NewPrefixCompleter(completers...) 
+	return readline.NewPrefixCompleter(completers...)
 }
 
 func actionNodeToPrefixCompleter(n *actionNode) *readline.PrefixCompleter {
@@ -20,7 +20,7 @@ func actionNodeToPrefixCompleter(n *actionNode) *readline.PrefixCompleter {
 
 	children := make([]readline.PrefixCompleterInterface, len(*n.children))
 	for i, childNode := range *n.children {
-		children[i] = actionNodeToPrefixCompleter(childNode) 
+		children[i] = actionNodeToPrefixCompleter(childNode)
 	}
 	return readline.PcItem(n.command, children...)
 }

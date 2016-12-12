@@ -37,7 +37,7 @@ func (t *Terminal) close() {
 
 func (t *Terminal) ClearScreen() {
 	os.Stdout.Write([]byte("\033[H\033[2J"))
-	t.instance.Refresh() 
+	t.instance.Refresh()
 }
 
 func (t *Terminal) Run() {
@@ -57,7 +57,7 @@ func (t *Terminal) Run() {
 			select {
 			case d := <-t.D:
 				t.state.reset(d)
-				t.ClearScreen()								
+				t.ClearScreen()
 			}
 		}
 	}()
@@ -95,7 +95,7 @@ func (t *Terminal) Run() {
 
 func NewTerminal() *Terminal {
 	return &Terminal{
-		D: make(chan *device.Device),
+		D:   make(chan *device.Device),
 		out: newOutout(),
 	}
 }

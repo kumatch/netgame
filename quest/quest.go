@@ -64,7 +64,7 @@ func verify(parent context.Context, world *questWorld, verifier *spec.Verifier) 
 				result := world.verify()
 				verifier.Result(result)
 				if result {
-					time.Sleep(5 * time.Second) 
+					time.Sleep(5 * time.Second)
 					succeed <- struct{}{}
 					return
 				}
