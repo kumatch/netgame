@@ -75,20 +75,20 @@ func (netIF *NetInterface) SetIPAddress(ipAddress *ipnet.IPAddresss) {
 	netIF.l3Address = ipAddress
 }
 
-func (netIF *NetInterface) SendPacket(receiveInterface *NetInterface) bool {
+func (netIF *NetInterface) SendPacket() net.IP {
 	if !netIF.status {
-		return false
+		return nil
 	}
 	if netIF.l3Address == nil {
-		return false
+		return nil
 	}
 	if netIF.l3Address.IsBroadcastAddress() {
-		return false
+		return nil
 	}
 	if netIF.l3Address.IsNetworkAddress() {
-		return false
+		return nil
 	}
-	return receiveInterface.ReceivePacket(netIF.l3Address.IP)
+	return netIF.l3Address.IP
 }
 
 func (netIF *NetInterface) ReceivePacket(ip net.IP) bool {
@@ -96,6 +96,9 @@ func (netIF *NetInterface) ReceivePacket(ip net.IP) bool {
 		return false
 	}
 	if netIF.l3Address == nil {
+		return false
+	}
+	if ip == nil {
 		return false
 	}
 	if !netIF.l3Address.Network.Contains(ip) {

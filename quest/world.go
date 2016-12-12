@@ -13,22 +13,22 @@ func (w *questWorld) verify() bool {
 	deviceDestinationNetworkInterface := w.device.getDestinationNetworkInterface()
 
 	// source companion -> device
-	if !srcCompanionInterface.SendPacket(deviceSourceNetworkInterface) {
+	if !deviceSourceNetworkInterface.ReceivePacket(srcCompanionInterface.SendPacket()) {
 		return false
 	}
 
 	// device -> destination companion
-	if !deviceDestinationNetworkInterface.SendPacket(destCompanionInterface) {
+	if !destCompanionInterface.ReceivePacket(deviceDestinationNetworkInterface.SendPacket()) {
 		return false
 	}
 
 	// destination companion -> device
-	if !destCompanionInterface.SendPacket(deviceDestinationNetworkInterface) {
+	if !deviceDestinationNetworkInterface.ReceivePacket(destCompanionInterface.SendPacket()) {
 		return false
 	}
 
 	// device -> source companion
-	if !deviceSourceNetworkInterface.SendPacket(srcCompanionInterface) {
+	if !srcCompanionInterface.ReceivePacket(deviceSourceNetworkInterface.SendPacket()) {
 		return false
 	}
 
