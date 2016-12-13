@@ -50,7 +50,7 @@ func destinationHost(ipAddress *ipnet.IPAddresss) string {
 		host = up(ipAddress.String())
 	} else {
 		host = up1(ipAddress.String())
-	}	
+	}
 	return host
 }
 

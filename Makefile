@@ -1,6 +1,6 @@
 .PHONY: test
 test:
-	go test -cover -v `glide novendor`
+	go test -cover `glide novendor`
 
 fmt:
 	go fmt ./...
