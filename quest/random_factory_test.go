@@ -6,6 +6,19 @@ import (
 	"testing"
 )
 
+func TestCreateRandomInterfaceNumber(t *testing.T) {
+	for i := 0; i < 10000; i++ {
+		n := createRandomInterfaceNumber()
+		switch n {
+		case 2:
+		case 4:
+		case 24:
+		default:
+			t.Errorf("got = %d", n)
+		}
+	}
+}
+
 func TestCreateRandomCIDRMask(t *testing.T) {
 	var i int
 	for i = 0; i < 10000; i++ {

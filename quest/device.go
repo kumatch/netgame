@@ -2,7 +2,6 @@ package quest
 
 import (
 	"math/rand"
-	"time"
 
 	"github.com/kumatch/netgame/device"
 )
@@ -33,21 +32,6 @@ func pickupInterfaceNumbers(number int) (if1, if2 int) {
 			return
 		}
 	}
-}
-
-func createRandomInterfaceNumber() int {
-	rand.Seed(time.Now().UnixNano())
-	t := rand.Intn(10)
-
-	switch {
-	case t < 6:
-		return 2
-	case t < 9:
-		return 4
-	case t == 9:
-		return 24
-	}
-	return 2
 }
 
 func newQuestDevice() *questDevice {

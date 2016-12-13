@@ -11,6 +11,21 @@ import (
 	"github.com/kumatch/netgame/ipnet"
 )
 
+func createRandomInterfaceNumber() int {
+	rand.Seed(time.Now().UnixNano())
+	t := rand.Intn(10)
+
+	switch {
+	case t < 6:
+		return 2
+	case t < 9:
+		return 4
+	case t == 9:
+		return 24
+	}
+	return 2
+}
+
 func createRandom8BitIPAddress() int {
 	return 1 + rand.Intn(255)
 }
